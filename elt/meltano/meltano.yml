@@ -1,0 +1,49 @@
+version: 1
+default_environment: dev
+project_id: 49280941-418a-49e7-acd1-d1bdb3e1f88f
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-postgres
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-postgres.git
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+  loaders:
+  - name: target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
+  - name: target-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-csv.git
+  utilities:
+  - name: airflow
+    variant: apache
+    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1
+      --constraint 
+      https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+    config:
+      core:
+        dags_are_paused_at_creation: false
+        dags_folder: /home/thiago/projetos/code-challenge/elt/meltano/orchestrate/airflow/dags
+        load_examples: false
+        plugins_folder: /home/thiago/projetos/code-challenge/elt/meltano/orchestrate/airflow/plugins
+      database:
+        sql_alchemy_conn: 
+          sqlite:////home/thiago/projetos/code-challenge/elt/meltano/.meltano/utilities/airflow/airflow.db
+      extension:
+        airflow_config: /home/thiago/projetos/code-challenge/elt/meltano/orchestrate/airflow/airflow.cfg
+        airflow_home: /home/thiago/projetos/code-challenge/elt/meltano/orchestrate/airflow
+      logging:
+        base_log_folder: /home/thiago/projetos/code-challenge/elt/meltano/.meltano/utilities/airflow/logs
+        dag_processor_manager_log_location: 
+          /home/thiago/projetos/code-challenge/elt/meltano/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log
+      scheduler:
+        child_process_log_directory: 
+          /home/thiago/projetos/code-challenge/elt/meltano/.meltano/utilities/airflow/logs/scheduler
+      webserver:
+        web_server_port: 8080
